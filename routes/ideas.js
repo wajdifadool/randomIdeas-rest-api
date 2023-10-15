@@ -1,114 +1,85 @@
-// We cant /api/ideas to this files in server.js
+// We can /api/ideas to this files in server.js
 const express = require('express');
-const router = express.Router() ;  
+const router = express.Router();
 
-
-
-const ideas = [
-    {
-      id: 1,
-      text: 'Positive NewsLetter, a newsletter that only shares positive, uplifting news',
-      tag: 'Technology',
-      username: 'TonyStark',
-      date: '2022-01-02',
-    },
-    {
-      id: 2,
-      text: 'Milk cartons that turn a different color the older that your milk is getting',
-      tag: 'Inventions',
-      username: 'SteveRogers',
-      date: '2022-01-02',
-    },
-    {
-      id: 3,
-      text: 'ATM location app which lets you know where the closest ATM is and if it is in service',
-      tag: 'Software',
-      username: 'BruceBanner',
-      date: '2022-01-02',
-    },
-  ];
-  
+const Idea = require('../models/Idea');
 
 // http://localhost:5000/api/ideas
-// Get all Ideas Route
-router.get('/' , (req, res)=> {
-    // send an object this is the common way
-    res.json({success: true , data:ideas} ) ;
-}); 
-
-
-// get asingle idea using query param (:id)
-router.get('/:id' , (req, res)=> {
-    // High order Array Methid
-    // the id is string therefore we want to convert it  to number
-    // because the id in object ideas is a number (int)
-    const idea = ideas.find( (idea) => idea.id === +req.params.id) ; 
-    //handle error 
-    if (!idea) {
-        return res
-            .status(404)
-            .json({success:false , error: 'Resource not Found'}) // not found
-    }
-    res.json({success: true , data:idea});
-}); 
-
-// add an Idea 
-router.post('/', (req , res )=> {
-  // demo id we canacsses request.body."Keys"
-  const idea  = {
-    id : ideas.length+1  , 
-    text : req.body.text,
-    tag: req.body.tag , 
-    username: req.body.username,
-    date: new Date().toISOString().slice(0,10)
+// Get all Ideas Route update to async await or await then
+router.get('/', async (req, res) => {
+  // when we use our model is async
+  try {
+    const ideas = await Idea.find();
+    res.json({ success: true, data: ideas });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Something went worng' }); // send an object this is the common way
   }
-  
-ideas.push(idea) ;
-  // midlleware allow us to accses request body 
-  res.send({success: true , data:idea}) ;z
 });
 
+// get asingle idea using query param (:id)
+router.get('/:id', async (req, res) => {
+  try {
+    const idea = await Idea.findById(req.params.id);
+    res.json({ success: true, data: idea });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: 'Resource not Found' }); // not found
+  }
+});
+
+// add an Idea  we also added async
+router.post('/', async (req, res) => {
+  // demo id we canacsses request.body."Keys"
+  const idea = new Idea({
+    // id : ideas.length+1  ,
+    text: req.body.text,
+    tag: req.body.tag,
+    username: req.body.username,
+    // date: new Date().toISOString().slice(0,10)
+  });
+
+  try {
+    // in this case we want to know if we saved idea  so we can rturned to the user -  we dont have to
+    const savedidea = await idea.save(); // will save the new idae to the data base
+    res.send({ success: true, data: savedidea });
+  } catch (error) {
+    console.log('new idea saved to database  = ', savedidea);
+    res.status(500).json({ success: false, error: 'Something went worng' }); // send an object this is the common way
+  }
+  // midlleware allow us to accses request body
+});
 
 // Update asingle idea using query param (:id)
-router.put('/:id' , (req, res)=> {
-  // High order Array Methid
-  // the id is string therefore we want to convert it  to number
-  // because the id in object ideas is a number (int)
-  const idea = ideas.find( (idea) => idea.id === +req.params.id) ; 
-  //handle error 
-  if (!idea) {
-      return res
-          .status(404)
-          .json({success:false , error: 'Resource not Found'}) // not found
+// new:true means if no idea with such an id it will uppdate
+// with an new one
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedIdea = await Idea.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          text: req.body.text,
+          tag: req.body.tag,
+        },
+      },
+      { new: true }
+    );
+    res.json({ success: true, data: updatedIdea });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: 'Resource not Found' }); // not found
   }
-  
-  // we found the idea , upadate taext and tag
-  idea.text = req.body.text || idea.text ; 
-  idea.tag = req.body.tag || idea.tag ; 
-  
-  res.json({success: true , data:idea});
-}); 
+});
 
 // Delete asingle idea using query param (:id)
-router.delete('/:id' , (req, res)=> {
-  // High order Array Methid
-  // the id is string therefore we want to convert it  to number
-  // because the id in object ideas is a number (int)
-  const idea = ideas.find( (idea) => idea.id === +req.params.id) ; 
-  //handle error 
-  if (!idea) {
-      return res
-          .status(404)
-          .json({success:false , error: 'Resource not Found'}) // not found
+router.delete('/:id', async (req, res) => {
+  try {
+    await Idea.findByIdAndDelete(req.params.id);
+    res.json({ success: true, data: 'delete successful' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: 'Resource not Found' }); // not found
   }
-  
-  // we found the idea , delet we can use splice 
-  const index = ideas.indexOf(idea)
-  ideas.splice(index,1) ; // we just remove 1 object
+});
 
-  res.json({success: true , result: `deleted`});
-}); 
-
-module.exports = router ;
-
-
+module.exports = router;

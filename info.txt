@@ -1,5 +1,8 @@
+// How to create Full working rest api Using : Express.js 
+// Now i can Build Full CRUD API with DataBase
+dTG1WbUsLMLiS1yk
 There are no starter files here. We start everything from scratch in the videos.
-
+# mongodb+srv://fadoolwajdi:<password>@cluster0.c3xmaat.mongodb.net/?retryWrites=true&w=majority
 11 : Express Setup
 npm i express // instll the experss 
 npm start  // run the server 
@@ -8,4 +11,10 @@ npm start  // run the server
 22: install nodemaon that will watch the server for changes 
     2: creating seprationg files 
     2 npm install -D nodemon
-    // "start": "node server.js" change back to thuss
+    // "start": "node server.js" change back to thuis
+
+3 :  adding middleware 
+    compliting the CRUD 
+    
+    4:  - Installing mongooses  and  dotenv
+        npm i mongooses dotenv
