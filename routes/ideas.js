@@ -52,4 +52,63 @@ router.get('/:id' , (req, res)=> {
     res.json({success: true , data:idea});
 }); 
 
+// add an Idea 
+router.post('/', (req , res )=> {
+  // demo id we canacsses request.body."Keys"
+  const idea  = {
+    id : ideas.length+1  , 
+    text : req.body.text,
+    tag: req.body.tag , 
+    username: req.body.username,
+    date: new Date().toISOString().slice(0,10)
+  }
+  
+ideas.push(idea) ;
+  // midlleware allow us to accses request body 
+  res.send({success: true , data:idea}) ;z
+});
+
+
+// Update asingle idea using query param (:id)
+router.put('/:id' , (req, res)=> {
+  // High order Array Methid
+  // the id is string therefore we want to convert it  to number
+  // because the id in object ideas is a number (int)
+  const idea = ideas.find( (idea) => idea.id === +req.params.id) ; 
+  //handle error 
+  if (!idea) {
+      return res
+          .status(404)
+          .json({success:false , error: 'Resource not Found'}) // not found
+  }
+  
+  // we found the idea , upadate taext and tag
+  idea.text = req.body.text || idea.text ; 
+  idea.tag = req.body.tag || idea.tag ; 
+  
+  res.json({success: true , data:idea});
+}); 
+
+// Delete asingle idea using query param (:id)
+router.delete('/:id' , (req, res)=> {
+  // High order Array Methid
+  // the id is string therefore we want to convert it  to number
+  // because the id in object ideas is a number (int)
+  const idea = ideas.find( (idea) => idea.id === +req.params.id) ; 
+  //handle error 
+  if (!idea) {
+      return res
+          .status(404)
+          .json({success:false , error: 'Resource not Found'}) // not found
+  }
+  
+  // we found the idea , delet we can use splice 
+  const index = ideas.indexOf(idea)
+  ideas.splice(index,1) ; // we just remove 1 object
+
+  res.json({success: true , result: `deleted`});
+}); 
+
 module.exports = router ;
+
+
