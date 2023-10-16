@@ -54,17 +54,26 @@ router.post('/', async (req, res) => {
 // with an new one
 router.put('/:id', async (req, res) => {
   try {
-    const updatedIdea = await Idea.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          text: req.body.text,
-          tag: req.body.tag,
+    const idea = await Idea.findById(req.params.id);
+    // match the user name with the idea.userNmae
+    if (idea.username === req.body.username) {
+      const updatedIdea = await Idea.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            text: req.body.text,
+            tag: req.body.tag,
+          },
         },
-      },
-      { new: true }
-    );
-    res.json({ success: true, data: updatedIdea });
+        { new: true }
+      );
+      return res.json({ success: true, data: updatedIdea });
+    } else {
+      // Usernames  do not match  .. 403 Not authrized
+      res
+        .status(403)
+        .json({ success: false, error: 'you are not authrized to update !' }); // not found
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, error: 'Resource not Found' }); // not found
@@ -74,8 +83,22 @@ router.put('/:id', async (req, res) => {
 // Delete asingle idea using query param (:id)
 router.delete('/:id', async (req, res) => {
   try {
-    await Idea.findByIdAndDelete(req.params.id);
-    res.json({ success: true, data: 'delete successful' });
+    // we want to validate before we delete ,
+    // this is not real world validation!
+    const idea = await Idea.findById(req.params.id);
+    // match the user name with the idea.userNmae
+    console.log('usenam', idea.username);
+    console.log('req', req.body.username);
+    if (idea.username === req.body.username) {
+      // console.log('req', req);
+      await Idea.findByIdAndDelete(req.params.id);
+      return res.json({ success: true, data: 'delete successful' });
+    }
+
+    // Usernames  do not match  .. 403 Not authrized
+    res
+      .status(403)
+      .json({ success: false, error: 'you are not authrized to delete !' }); // not found
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, error: 'Resource not Found' }); // not found
