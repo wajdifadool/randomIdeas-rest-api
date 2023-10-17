@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: false })); // this is the common way to d
 
 app.use(
   cors({
-    // enbled URL that allowed to route to the server
+    // enbled URL that allowed to route to the server on both envoirment , dev and production
     origin: ['http://localhost:3000', 'http://localhost:5000'],
     credentials: true,
   })
