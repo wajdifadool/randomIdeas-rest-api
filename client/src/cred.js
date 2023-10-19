@@ -17,6 +17,13 @@ class Cred {
       // Missing code
       // Add you Fire Base config here
       // ...
+
+      apiKey: 'AIzaSyAmFtZxAjC1_OxwmgFtRmOkCYw9J3eAn6Q',
+      authDomain: 'fir-authdemo-1fc7a.firebaseapp.com',
+      projectId: 'fir-authdemo-1fc7a',
+      storageBucket: 'fir-authdemo-1fc7a.appspot.com',
+      messagingSenderId: '889501804888',
+      appId: '1:889501804888:web:1c1b9a5bb9cc5d87d6dd2d',
     };
 
     // Initialize Firebase
